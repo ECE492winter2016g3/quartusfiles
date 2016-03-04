@@ -32,6 +32,7 @@
 #include "includes.h"
 #include <system.h>
 #include <altera_avalon_pio_regs.h>
+#include <altera_avalon_uart_regs.h>
 #include "i2c_opencores.h"
 
 /* Definition of Task Stacks */
@@ -75,9 +76,9 @@ void task1(void* pdata)
     }
 	*/
 
-    for (j = 0; j < 7; j++) {
+//    for (j = 0; j < 7; j++) {
   	  //I2C_write(I2C_OPENCORES_LIDAR_BASE, j, 0);
-    }
+//    }
     /*
     //Last write
     I2C_write(I2C_OPENCORES_LIDAR_BASE, j, 1);
@@ -104,14 +105,39 @@ void task1(void* pdata)
   while (1)
   {
     IOWR(PIO_LEDS_BASE, 0, leds++);
+
+//    if(IORD_ALTERA_AVALON_UART_STATUS(UART_BLUETOOTH_BASE) & ALTERA_AVALON_UART_STATUS_TRDY_MSK) {
+//        printf("Writing: 5\n");
+//    	IOWR_ALTERA_AVALON_UART_TXDATA(UART_BLUETOOTH_BASE, '5');
+//    }
     //printf("%d\n", leds);
     OSTimeDlyHMSM(0, 0, 1, 0);
   }
 }
+/* Queue Configuration */
+#define QUEUE_LENGTH 8
+OS_EVENT* queue;
+void* queueBuf[QUEUE_LENGTH];
+
+void task2(void* pdata) {
+	char message = '1';
+	INT8U err;
+	while(1) {
+		message = (char) OSQPend(queue, 0, &err);
+		printf("Received: %s\n", &message);
+	}
+}
+static void uart_irq(void* context) {
+	static char read;
+	read = IORD_ALTERA_AVALON_UART_RXDATA(UART_BLUETOOTH_BASE);
+	OSQPost(queue, (void*) read);
+}
+
 /* The main function creates two task and starts multi-tasking */
 int main(void)
 {
   
+    queue = OSQCreate(queueBuf, QUEUE_LENGTH);
   OSTaskCreateExt(task1,
                   NULL,
                   (void *)&task1_stk[TASK_STACKSIZE-1],
@@ -121,6 +147,25 @@ int main(void)
                   TASK_STACKSIZE,
                   NULL,
                   0);
+  OSTaskCreateExt(task2,
+                  NULL,
+                  (void *)&task2_stk[TASK_STACKSIZE-1],
+                  TASK2_PRIORITY,
+                  TASK2_PRIORITY,
+                  task2_stk,
+                  TASK_STACKSIZE,
+                  NULL,
+                  0);
+  if(alt_ic_isr_register(
+				  UART_BLUETOOTH_IRQ_INTERRUPT_CONTROLLER_ID,
+				  UART_BLUETOOTH_IRQ,
+				  &uart_irq,
+				  NULL,
+				  NULL
+  )) {
+          printf("Register failed\n");
+  }
+
 
   OSStart();
   return 0;
