@@ -34,16 +34,24 @@
 #include <altera_avalon_pio_regs.h>
 #include <altera_avalon_uart_regs.h>
 #include "i2c_opencores.h"
+#include "packet_buffer.h"
+
+typedef struct {
+	char* buf;
+	int len
+} mBuffer;
 
 /* Definition of Task Stacks */
 #define   TASK_STACKSIZE       2048
 OS_STK    task1_stk[TASK_STACKSIZE];
 OS_STK    task2_stk[TASK_STACKSIZE];
+OS_STK    task3_stk[TASK_STACKSIZE];
 
 /* Definition of Task Priorities */
 
 #define TASK1_PRIORITY      1
 #define TASK2_PRIORITY      2
+#define TASK3_PRIORITY      3
 
 /* Prints "Hello World" and sleeps for three seconds */
 void task1(void* pdata)
@@ -115,22 +123,84 @@ void task1(void* pdata)
   }
 }
 /* Queue Configuration */
-#define QUEUE_LENGTH 8
+// TODO: Make sure QUEUE_LENGTH is big enough for packets being sent
+// Needs to be able to contain roughly an entire packet at once
+// because the interrupts get fired in rapid succession when a packet
+// is sent, before the task has a chance to empty it out.
+// TODO: Maybe rethink what data structure we're using here
+#define QUEUE_LENGTH 256
 OS_EVENT* queue;
 void* queueBuf[QUEUE_LENGTH];
+
+#define QUEUE2_LENGTH 10
+OS_EVENT* queue2;
+void* queue2Buf[QUEUE_LENGTH];
 
 void task2(void* pdata) {
 	char message = '1';
 	INT8U err;
+	PacketBuffer pb;
+	init(&pb);
+	mBuffer buf;
+	int len;
+
 	while(1) {
 		message = (char) OSQPend(queue, 0, &err);
-		printf("Received: %s\n", &message);
+		printf("Received %i\n", message);
+		if(message == START_BYTE) {
+			printf("Start of Packet!\n");
+			clear(&pb);
+		} else if(message == END_BYTE) {
+			printf("End of Packet!\n");
+			buf.buf = (char*) malloc(BUF_SIZE * sizeof(char));
+			memset(buf.buf, 0, BUF_SIZE);
+			buf.len = read(&pb, buf.buf);
+			printf("Packet contents: %s\n", buf);
+			OSQPost(queue2, (void*) &buf);
+			// TODO: Do something with the buffer now
+		} else {
+			if(pushChar(&pb, message)) {
+				printf("Putting char: %s\n", &message);
+			} else {
+				printf("No room in buffer!\n");
+			}
+		}
+
 	}
 }
 static void uart_irq(void* context) {
 	static char read;
+	// NOTE: This read also clears the status register, notifying
+	// the UART core that the next interrupt can be fired.
 	read = IORD_ALTERA_AVALON_UART_RXDATA(UART_BLUETOOTH_BASE);
 	OSQPost(queue, (void*) read);
+}
+
+void task3(void* pdata) {
+	mBuffer buf;
+	INT8U err;
+	int nextByte = 0;
+	while(1) {
+		buf = *((mBuffer*) OSQPend(queue2, 0, &err));
+
+		printf("From task 3: packet: %s\n", buf.buf);
+
+		printf("Task 3 :: Sending\n");
+		while(!(IORD_ALTERA_AVALON_UART_STATUS(UART_BLUETOOTH_BASE) & ALTERA_AVALON_UART_STATUS_TRDY_MSK));
+		IOWR_ALTERA_AVALON_UART_TXDATA(UART_BLUETOOTH_BASE, START_BYTE);
+
+		printf("Task 3 :: Into Loop\n");
+		while(nextByte < buf.len) {
+			printf("Task 3 :: Sending byte %i: '%i'\n", nextByte, buf.buf[nextByte]);
+			while(!(IORD_ALTERA_AVALON_UART_STATUS(UART_BLUETOOTH_BASE) & ALTERA_AVALON_UART_STATUS_TRDY_MSK));
+			IOWR_ALTERA_AVALON_UART_TXDATA(UART_BLUETOOTH_BASE, buf.buf[nextByte++]);
+		}
+		printf("Task 3 :: Out of Loop\n");
+		while(!(IORD_ALTERA_AVALON_UART_STATUS(UART_BLUETOOTH_BASE) & ALTERA_AVALON_UART_STATUS_TRDY_MSK));
+		IOWR_ALTERA_AVALON_UART_TXDATA(UART_BLUETOOTH_BASE, END_BYTE);
+
+		free(buf);
+	}
 }
 
 /* The main function creates two task and starts multi-tasking */
@@ -138,6 +208,7 @@ int main(void)
 {
   
     queue = OSQCreate(queueBuf, QUEUE_LENGTH);
+    queue2 = OSQCreate(queue2Buf, QUEUE_LENGTH);
   OSTaskCreateExt(task1,
                   NULL,
                   (void *)&task1_stk[TASK_STACKSIZE-1],
@@ -153,6 +224,15 @@ int main(void)
                   TASK2_PRIORITY,
                   TASK2_PRIORITY,
                   task2_stk,
+                  TASK_STACKSIZE,
+                  NULL,
+                  0);
+  OSTaskCreateExt(task3,
+                  NULL,
+                  (void *)&task3_stk[TASK_STACKSIZE-1],
+                  TASK3_PRIORITY,
+                  TASK3_PRIORITY,
+                  task3_stk,
                   TASK_STACKSIZE,
                   NULL,
                   0);

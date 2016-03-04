@@ -142,7 +142,8 @@ ACDS_VERSION := 12.1sp1
 ELF := MappingRobotSoftware.elf
 
 # Paths to C, C++, and assembly source files.
-C_SRCS := hello_ucosii.c
+C_SRCS += hello_ucosii.c
+C_SRCS += packet_buffer.c
 CXX_SRCS :=
 ASM_SRCS :=
 
