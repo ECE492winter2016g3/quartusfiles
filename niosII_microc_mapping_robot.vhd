@@ -52,7 +52,7 @@ library ieee;
 		I2C_SDAT		:  inout	std_logic;
 		
 		-- GPIO lines 
-		GPIO_1		: 	inout DE0_GPIO_1;
+		GPIO_1		: 	inout std_logic_vector(35 downto 0) := (others=>'X');
 		
 		--Flash 
 		EPCS_ASDO	:	out std_logic;
@@ -89,7 +89,9 @@ architecture structure of niosII_microc_mapping_robot is
 			epcs_flash_controller_0_external_dclk		: out	  std_logic;
 			epcs_flash_controller_0_external_sce		: out	  std_logic;			
 			epcs_flash_controller_0_external_sdo		: out	  std_logic;
-			epcs_flash_controller_0_external_data0		: in	  std_logic
+			epcs_flash_controller_0_external_data0		: in	  std_logic;
+			i2c_scl_external_connection_export			: out	  std_logic;
+			i2c_sda_external_connection_export			: inout std_logic :='X'
 		);		
 	
     end component niosII_system;
@@ -109,10 +111,11 @@ begin
 	
 	DRAM_DQM <= DQM;	
 	
-	I2C_SCLK <= I2C_SCL_S;
-	I2C_SDAT <= I2C_SDA_S;
-	GPIO_1(7) <= I2C_SCL_S;
-	GPIO_1(3) <= I2C_SDA_S;
+	--I2C_SCLK <= I2C_SCL_S;
+	--I2C_SDAT <= I2C_SDA_S;
+	--GPIO_1(7) <= I2C_SCL_S;
+	--GPIO_1(3) <= I2C_SDA_S;
+	
 	
 	-- Component Instantiation Statement (optional)
 	
@@ -120,8 +123,8 @@ begin
 			port map(
 				altpll_0_c0_clk                         => DRAM_CLK,                        
 				reset_reset_n                           => KEY(0),                          
-				i2c_opencores_0_export_scl_pad_io		 => I2C_SCL_S,	
-				i2c_opencores_0_export_sda_pad_io		 => I2C_SDA_S,	
+				i2c_opencores_0_export_scl_pad_io		 => GPIO_1(9),	
+				i2c_opencores_0_export_sda_pad_io		 => GPIO_1(11),	
 				clk_clk                                 => CLOCK_50,                                
 				sdram_0_wire_addr                       => DRAM_ADDR,                      
 				sdram_0_wire_ba                         => BA,                        
@@ -138,7 +141,9 @@ begin
 				epcs_flash_controller_0_external_dclk	 => EPCS_DCLK,	
 				epcs_flash_controller_0_external_sce	 => EPCS_NCSO,				
 				epcs_flash_controller_0_external_sdo	 => EPCS_ASDO,	
-				epcs_flash_controller_0_external_data0	 => EPCS_DATA0
+				epcs_flash_controller_0_external_data0	 => EPCS_DATA0,
+				i2c_scl_external_connection_export      => GPIO_1(7),
+				i2c_sda_external_connection_export      => GPIO_1(3)
 			);
 
 end structure;

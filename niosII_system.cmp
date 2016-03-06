@@ -20,7 +20,9 @@
 			epcs_flash_controller_0_external_dclk  : out   std_logic;                                        -- dclk
 			epcs_flash_controller_0_external_sce   : out   std_logic;                                        -- sce
 			epcs_flash_controller_0_external_sdo   : out   std_logic;                                        -- sdo
-			epcs_flash_controller_0_external_data0 : in    std_logic                     := 'X'              -- data0
+			epcs_flash_controller_0_external_data0 : in    std_logic                     := 'X';             -- data0
+			i2c_scl_external_connection_export     : out   std_logic;                                        -- export
+			i2c_sda_external_connection_export     : inout std_logic                     := 'X'              -- export
 		);
 	end component niosII_system;
 

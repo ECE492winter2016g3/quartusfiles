@@ -2,9 +2,9 @@
 <sch:Settings xmlns:sch="http://www.altera.com/embeddedsw/bsp/schema">
         <BspType>ucosii</BspType>
         <BspVersion>default</BspVersion>
-        <BspGeneratedTimeStamp>Mar 1, 2016 3:20:58 PM</BspGeneratedTimeStamp>
-        <BspGeneratedUnixTimeStamp>1456870858125</BspGeneratedUnixTimeStamp>
-        <BspGeneratedLocation>/afs/ualberta.ca/home/c/j/cjamison/ece492/MappingRobot/software/MappingRobotSoftware_bsp</BspGeneratedLocation>
+        <BspGeneratedTimeStamp>Mar 5, 2016 7:40:20 PM</BspGeneratedTimeStamp>
+        <BspGeneratedUnixTimeStamp>1457232020236</BspGeneratedUnixTimeStamp>
+        <BspGeneratedLocation>/afs/ualberta.ca/home/j/k/jkeeling/ece492/quartusfiles/software/MappingRobotSoftware_bsp</BspGeneratedLocation>
         <BspSettingsFile>settings.bsp</BspSettingsFile>
         <SopcDesignFile>../../niosII_system.sopcinfo</SopcDesignFile>
         <JdiFile>default</JdiFile>
@@ -1751,26 +1751,38 @@
                 <attributes>timer</attributes>
         </MemoryMap>
         <MemoryMap>
-                <slaveDescriptor>altpll</slaveDescriptor>
+                <slaveDescriptor>I2C_SDA</slaveDescriptor>
                 <addressRange>0x01012060 - 0x0101206F</addressRange>
                 <addressSpan>16</addressSpan>
                 <attributes/>
         </MemoryMap>
         <MemoryMap>
-                <slaveDescriptor>pio_leds</slaveDescriptor>
+                <slaveDescriptor>I2C_SCL</slaveDescriptor>
                 <addressRange>0x01012070 - 0x0101207F</addressRange>
                 <addressSpan>16</addressSpan>
                 <attributes/>
         </MemoryMap>
         <MemoryMap>
+                <slaveDescriptor>altpll</slaveDescriptor>
+                <addressRange>0x01012080 - 0x0101208F</addressRange>
+                <addressSpan>16</addressSpan>
+                <attributes/>
+        </MemoryMap>
+        <MemoryMap>
+                <slaveDescriptor>pio_leds</slaveDescriptor>
+                <addressRange>0x01012090 - 0x0101209F</addressRange>
+                <addressSpan>16</addressSpan>
+                <attributes/>
+        </MemoryMap>
+        <MemoryMap>
                 <slaveDescriptor>jtag_uart</slaveDescriptor>
-                <addressRange>0x01012080 - 0x01012087</addressRange>
+                <addressRange>0x010120A0 - 0x010120A7</addressRange>
                 <addressSpan>8</addressSpan>
                 <attributes>printable</attributes>
         </MemoryMap>
         <MemoryMap>
                 <slaveDescriptor>sysid</slaveDescriptor>
-                <addressRange>0x01012088 - 0x0101208F</addressRange>
+                <addressRange>0x010120A8 - 0x010120AF</addressRange>
                 <addressSpan>8</addressSpan>
                 <attributes/>
         </MemoryMap>

@@ -25,7 +25,7 @@ typedef struct {
 void init(PacketBuffer* pb);
 int push(PacketBuffer* pb, char* inBuf, int len);
 int pushChar(PacketBuffer* pb, char in);
-int read(PacketBuffer* pb, char* outBuf);
+int mRead(PacketBuffer* pb, char* outBuf);
 void clear(PacketBuffer* pb);
 
 

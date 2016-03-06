@@ -42,7 +42,7 @@ int pushChar(PacketBuffer* pb, char in) {
 	return TRUE;
 }
 
-int read(PacketBuffer* pb, char* outBuf) {
+int mRead(PacketBuffer* pb, char* outBuf) {
 	int i;
 	int index;
 	for(i = 0; i < pb->myLen; ++i) {

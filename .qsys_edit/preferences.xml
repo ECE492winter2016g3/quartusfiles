@@ -14,6 +14,7 @@
    <frequency preferredWidth="365" />
   </columns>
  </clocktable>
- <library expandedCategories="Library/University Program,Library,Project" />
- <window width="1444" height="854" x="0" y="25" />
+ <library
+   expandedCategories="Project,Library,Library/Peripherals/Microcontroller Peripherals,Library/Peripherals" />
+ <window width="1444" height="854" x="-71" y="520" />
 </preferences>

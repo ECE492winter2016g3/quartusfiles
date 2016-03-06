@@ -35,6 +35,7 @@
 #include <altera_avalon_uart_regs.h>
 #include "i2c_opencores.h"
 #include "packet_buffer.h"
+#include "terasic_lib/terasic_includes.h";
 
 typedef struct {
 	char* buf;
@@ -52,24 +53,69 @@ OS_STK    task3_stk[TASK_STACKSIZE];
 #define TASK1_PRIORITY      1
 #define TASK2_PRIORITY      2
 #define TASK3_PRIORITY      3
+#define LIDAR_I2C_ADDRESS   0xC4
 
 /* Prints "Hello World" and sleeps for three seconds */
 void task1(void* pdata)
 {
+
   char leds = 0;
   int data = 12;
   int status = 0;
   int j;
 
+  	//Terasic I2C
+  	//Test Addressing
+    I2C_Start(I2C_SCL_BASE, I2C_SDA_BASE);
+    status = i2c_selectAddress(I2C_SCL_BASE, I2C_SDA_BASE, LIDAR_I2C_ADDRESS);
+    printf("I2C status: %i\n", status);
+    I2C_Stop(I2C_SCL_BASE, I2C_SDA_BASE);
+
+    //laser loop
+    while(1) {
+    	bool ack = FALSE;
+    	alt_8 poll_value = 0x04;
+    	alt_8 upper = 0;
+    	alt_8 lower = 0;
+    	int range = 0;
+    	//Poll laser
+    	while(ack == FALSE) {
+    	    I2C_Start(I2C_SCL_BASE, I2C_SDA_BASE);
+    		ack = I2C_WriteToDeviceRegister(I2C_SCL_BASE, I2C_SDA_BASE, LIDAR_I2C_ADDRESS, 0x00, &poll_value, 1);
+    		I2C_Stop(I2C_SCL_BASE, I2C_SDA_BASE);
+    		OSTimeDlyHMSM(0, 0, 1, 0);
+    	}
+        I2C_Start(I2C_SCL_BASE, I2C_SDA_BASE);
+    	if(FALSE == I2C_ReadFromDeviceRegister(I2C_SCL_BASE, I2C_SDA_BASE, LIDAR_I2C_ADDRESS, 0x0f, &upper, 1, FALSE)) {
+    		printf("I2C READ1 FAILED\n");
+    	}
+    	else {
+        	I2C_Stop(I2C_SCL_BASE, I2C_SDA_BASE);
+    		I2C_Start(I2C_SCL_BASE, I2C_SDA_BASE);
+    		if(FALSE == I2C_ReadFromDeviceRegister(I2C_SCL_BASE, I2C_SDA_BASE, LIDAR_I2C_ADDRESS, 0x10, &lower, 1, TRUE)) {
+    			printf("I2C READ2 FAILED\n");
+    		}
+    		else {
+    			printf("\nresults: %i, %i\n", upper, lower);
+    			range = (upper << 8) + lower;
+    			printf("RANGE: %i\n", range);
+    		}
+    	}
+    	I2C_Stop(I2C_SCL_BASE, I2C_SDA_BASE);
+    }
+
+
+
+
     //Init I2C
-    I2C_init(I2C_OPENCORES_LIDAR_BASE, ALT_CPU_CPU_FREQ, 35000);
+    //I2C_init(I2C_OPENCORES_LIDAR_BASE, ALT_CPU_CPU_FREQ, 35000);
     //I2C_init(I2C_OPENCORES_LIDAR_BASE, ALT_CPU_CPU_FREQ, 100000);
 
-    printf("I2C initialized\n");
+    //printf("I2C initialized\n");
     //Writing to EEPROM
-    status = I2C_start(I2C_OPENCORES_LIDAR_BASE, 0x50, 0);
-    I2C_write(I2C_OPENCORES_LIDAR_BASE, 0, 1);
-    printf("Status: %i\n", status);
+    //status = I2C_start(I2C_OPENCORES_LIDAR_BASE, 0x50, 0);
+    //I2C_write(I2C_OPENCORES_LIDAR_BASE, 0, 1);
+    //printf("Status: %i\n", status);
     //frustration test
     /*
     for (j = 0; j < 128; j++) {
@@ -154,7 +200,7 @@ void task2(void* pdata) {
 			printf("End of Packet!\n");
 			buf.buf = (char*) malloc(BUF_SIZE * sizeof(char));
 			memset(buf.buf, 0, BUF_SIZE);
-			buf.len = read(&pb, buf.buf);
+			buf.len = mRead(&pb, buf.buf);
 			printf("Packet contents: %s\n", buf);
 			OSQPost(queue2, (void*) &buf);
 			// TODO: Do something with the buffer now
@@ -181,6 +227,7 @@ void task3(void* pdata) {
 	INT8U err;
 	int nextByte = 0;
 	while(1) {
+		nextByte = 0;
 		buf = *((mBuffer*) OSQPend(queue2, 0, &err));
 
 		printf("From task 3: packet: %s\n", buf.buf);
@@ -199,7 +246,7 @@ void task3(void* pdata) {
 		while(!(IORD_ALTERA_AVALON_UART_STATUS(UART_BLUETOOTH_BASE) & ALTERA_AVALON_UART_STATUS_TRDY_MSK));
 		IOWR_ALTERA_AVALON_UART_TXDATA(UART_BLUETOOTH_BASE, END_BYTE);
 
-		free(buf);
+		free(buf.buf);
 	}
 }
 

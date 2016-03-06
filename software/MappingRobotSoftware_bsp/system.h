@@ -4,7 +4,7 @@
  * Machine generated for CPU 'nios2_qsys' in SOPC Builder design 'niosII_system'
  * SOPC Builder design path: ../../niosII_system.sopcinfo
  *
- * Generated: Tue Mar 01 15:20:58 MST 2016
+ * Generated: Sat Mar 05 15:40:37 MST 2016
  */
 
 /*
@@ -141,6 +141,60 @@
 
 
 /*
+ * I2C_SCL configuration
+ *
+ */
+
+#define ALT_MODULE_CLASS_I2C_SCL altera_avalon_pio
+#define I2C_SCL_BASE 0x1012070
+#define I2C_SCL_BIT_CLEARING_EDGE_REGISTER 0
+#define I2C_SCL_BIT_MODIFYING_OUTPUT_REGISTER 0
+#define I2C_SCL_CAPTURE 0
+#define I2C_SCL_DATA_WIDTH 1
+#define I2C_SCL_DO_TEST_BENCH_WIRING 0
+#define I2C_SCL_DRIVEN_SIM_VALUE 0x0
+#define I2C_SCL_EDGE_TYPE "NONE"
+#define I2C_SCL_FREQ 50000000u
+#define I2C_SCL_HAS_IN 0
+#define I2C_SCL_HAS_OUT 1
+#define I2C_SCL_HAS_TRI 0
+#define I2C_SCL_IRQ -1
+#define I2C_SCL_IRQ_INTERRUPT_CONTROLLER_ID -1
+#define I2C_SCL_IRQ_TYPE "NONE"
+#define I2C_SCL_NAME "/dev/I2C_SCL"
+#define I2C_SCL_RESET_VALUE 0x0
+#define I2C_SCL_SPAN 16
+#define I2C_SCL_TYPE "altera_avalon_pio"
+
+
+/*
+ * I2C_SDA configuration
+ *
+ */
+
+#define ALT_MODULE_CLASS_I2C_SDA altera_avalon_pio
+#define I2C_SDA_BASE 0x1012060
+#define I2C_SDA_BIT_CLEARING_EDGE_REGISTER 0
+#define I2C_SDA_BIT_MODIFYING_OUTPUT_REGISTER 0
+#define I2C_SDA_CAPTURE 0
+#define I2C_SDA_DATA_WIDTH 1
+#define I2C_SDA_DO_TEST_BENCH_WIRING 0
+#define I2C_SDA_DRIVEN_SIM_VALUE 0x0
+#define I2C_SDA_EDGE_TYPE "NONE"
+#define I2C_SDA_FREQ 50000000u
+#define I2C_SDA_HAS_IN 0
+#define I2C_SDA_HAS_OUT 0
+#define I2C_SDA_HAS_TRI 1
+#define I2C_SDA_IRQ -1
+#define I2C_SDA_IRQ_INTERRUPT_CONTROLLER_ID -1
+#define I2C_SDA_IRQ_TYPE "NONE"
+#define I2C_SDA_NAME "/dev/I2C_SDA"
+#define I2C_SDA_RESET_VALUE 0x0
+#define I2C_SDA_SPAN 16
+#define I2C_SDA_TYPE "altera_avalon_pio"
+
+
+/*
  * System configuration
  *
  */
@@ -156,19 +210,19 @@
 #define ALT_NUM_INTERNAL_INTERRUPT_CONTROLLERS 1
 #define ALT_NUM_INTERRUPT_CONTROLLERS 1
 #define ALT_STDERR "/dev/jtag_uart"
-#define ALT_STDERR_BASE 0x1012080
+#define ALT_STDERR_BASE 0x10120a0
 #define ALT_STDERR_DEV jtag_uart
 #define ALT_STDERR_IS_JTAG_UART
 #define ALT_STDERR_PRESENT
 #define ALT_STDERR_TYPE "altera_avalon_jtag_uart"
 #define ALT_STDIN "/dev/jtag_uart"
-#define ALT_STDIN_BASE 0x1012080
+#define ALT_STDIN_BASE 0x10120a0
 #define ALT_STDIN_DEV jtag_uart
 #define ALT_STDIN_IS_JTAG_UART
 #define ALT_STDIN_PRESENT
 #define ALT_STDIN_TYPE "altera_avalon_jtag_uart"
 #define ALT_STDOUT "/dev/jtag_uart"
-#define ALT_STDOUT_BASE 0x1012080
+#define ALT_STDOUT_BASE 0x10120a0
 #define ALT_STDOUT_DEV jtag_uart
 #define ALT_STDOUT_IS_JTAG_UART
 #define ALT_STDOUT_PRESENT
@@ -181,7 +235,7 @@
  *
  */
 
-#define ALTPLL_BASE 0x1012060
+#define ALTPLL_BASE 0x1012080
 #define ALTPLL_IRQ -1
 #define ALTPLL_IRQ_INTERRUPT_CONTROLLER_ID -1
 #define ALTPLL_NAME "/dev/altpll"
@@ -235,7 +289,7 @@
  */
 
 #define ALT_MODULE_CLASS_jtag_uart altera_avalon_jtag_uart
-#define JTAG_UART_BASE 0x1012080
+#define JTAG_UART_BASE 0x10120a0
 #define JTAG_UART_IRQ 1
 #define JTAG_UART_IRQ_INTERRUPT_CONTROLLER_ID 0
 #define JTAG_UART_NAME "/dev/jtag_uart"
@@ -282,7 +336,7 @@
  */
 
 #define ALT_MODULE_CLASS_pio_leds altera_avalon_pio
-#define PIO_LEDS_BASE 0x1012070
+#define PIO_LEDS_BASE 0x1012090
 #define PIO_LEDS_BIT_CLEARING_EDGE_REGISTER 0
 #define PIO_LEDS_BIT_MODIFYING_OUTPUT_REGISTER 0
 #define PIO_LEDS_CAPTURE 0
@@ -348,13 +402,13 @@
  */
 
 #define ALT_MODULE_CLASS_sysid altera_avalon_sysid_qsys
-#define SYSID_BASE 0x1012088
+#define SYSID_BASE 0x10120a8
 #define SYSID_ID 0
 #define SYSID_IRQ -1
 #define SYSID_IRQ_INTERRUPT_CONTROLLER_ID -1
 #define SYSID_NAME "/dev/sysid"
 #define SYSID_SPAN 8
-#define SYSID_TIMESTAMP 1456870593
+#define SYSID_TIMESTAMP 1457215857
 #define SYSID_TYPE "altera_avalon_sysid_qsys"
 
 
